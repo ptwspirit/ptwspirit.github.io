@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Jump Game</title>
+  <title>Tetris</title>
 </head>
 <body>
   <canvas id="canvas" width="500" height="500"></canvas>
@@ -11,46 +11,99 @@
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
 
-    var player = {
-      x: 250,
-      y: 250,
-      width: 50,
-      height: 50
-    };
-
-    var obstacle = {
-      x: 400,
-      y: 250,
-      width: 50,
-      height: 50
-    };
-
-    var gameOver = false;
+    var blocks = [];
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#000";
-      ctx.fillRect(player.x, player.y, player.width, player.height);
+      for (var i = 0; i < blocks.length; i++) {
+        var block = blocks[i];
 
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.fillStyle = block.color;
+        ctx.fillRect(block.x, block.y, block.width, block.height);
+      }
+    }
 
-      if (player.y > canvas.height) {
-        gameOver = true;
+    function generateBlock() {
+      var block = {
+        x: 0,
+        y: 0,
+        width: 20,
+        height: 20,
+        color: "random"
+      };
+
+      var x = Math.floor(Math.random() * (canvas.width - block.width));
+      var y = 0;
+
+      while (y < canvas.height - block.height) {
+        if (checkCollision(block, x, y)) {
+          break;
+        }
+
+        y++;
       }
 
-      if (!gameOver) {
-        player.y++;
+      block.x = x;
+      block.y = y;
+
+      blocks.push(block);
+    }
+
+    function checkCollision(block, x, y) {
+      for (var i = 0; i < blocks.length; i++) {
+        if (i === blocks.indexOf(block)) {
+          continue;
+        }
+
+        var otherBlock = blocks[i];
+
+        if (x === otherBlock.x && y === otherBlock.y) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function moveBlock(direction) {
+      var block = blocks[blocks.length - 1];
+
+      switch (direction) {
+        case "left":
+          block.x--;
+          break;
+        case "right":
+          block.x++;
+          break;
+        case "down":
+          block.y++;
+          break;
+      }
+
+      if (checkCollision(block, block.x, block.y)) {
+        block.y--;
       }
     }
 
     window.addEventListener("keydown", function(event) {
-      if (event.keyCode === 38) {
-        player.y--;
+      switch (event.keyCode) {
+        case 37:
+          moveBlock("left");
+          break;
+        case 38:
+          // do nothing
+          break;
+        case 39:
+          moveBlock("right");
+          break;
+        case 40:
+          moveBlock("down");
+          break;
       }
     });
 
+    setInterval(generateBlock, 1000);
     setInterval(draw, 20);
   </script>
 </body>
