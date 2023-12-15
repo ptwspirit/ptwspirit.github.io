@@ -1,1 +1,57 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jump Game</title>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500"></canvas>
+
+  <script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    var player = {
+      x: 250,
+      y: 250,
+      width: 50,
+      height: 50
+    };
+
+    var obstacle = {
+      x: 400,
+      y: 250,
+      width: 50,
+      height: 50
+    };
+
+    var gameOver = false;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#000";
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+      if (player.y > canvas.height) {
+        gameOver = true;
+      }
+
+      if (!gameOver) {
+        player.y++;
+      }
+    }
+
+    window.addEventListener("keydown", function(event) {
+      if (event.keyCode === 38) {
+        player.y--;
+      }
+    });
+
+    setInterval(draw, 20);
+  </script>
+</body>
+</html>
