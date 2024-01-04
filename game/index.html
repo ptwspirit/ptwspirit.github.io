@@ -119,6 +119,18 @@
       currentShape = getRandomShape();
       currentRow = 0;
       currentCol = Math.floor(cols / 2) - Math.floor(currentShape[0].length / 2);
+
+      // 게임 종료 확인
+      if (collision()) {
+        // 게임 종료 로직 추가
+        alert("Game Over!");
+        // 새 게임 시작을 위해 보드 초기화
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            board[row][col] = 0;
+          }
+        }
+      }
     }
 
     function update() {
