@@ -46,6 +46,7 @@
     let currentShape = getRandomShape();
     let currentRow = 0;
     let currentCol = Math.floor(cols / 2) - Math.floor(currentShape[0].length / 2);
+    let gameSpeed = 500; // 블록이 내려오는 속도 (밀리초)
 
     function getRandomShape() {
       const randomIndex = Math.floor(Math.random() * shapes.length);
@@ -200,7 +201,7 @@
     function gameLoop() {
       update();
       draw();
-      requestAnimationFrame(gameLoop);
+      setTimeout(gameLoop, gameSpeed);
     }
 
     gameLoop();
