@@ -1,73 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>간단한 계산기</title>
-    <style>
-        /* 간단한 스타일링을 위한 CSS */
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        input {
-            width: 40px;
-            padding: 5px;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    canvas {
+      border: 1px solid #333;
+    }
+  </style>
 </head>
 <body>
-    <h1>간단한 계산기</h1>
-    
-    <!-- 입력창 -->
-    <input type="text" id="display" readonly>
+  <canvas id="tetrisCanvas" width="300" height="600"></canvas>
 
-    <!-- 버튼들 -->
-    <br>
-    <button onclick="appendToDisplay('1')">1</button>
-    <button onclick="appendToDisplay('2')">2</button>
-    <button onclick="appendToDisplay('3')">3</button>
-    <button onclick="appendToDisplay('+')">+</button>
-    <br>
-    <button onclick="appendToDisplay('4')">4</button>
-    <button onclick="appendToDisplay('5')">5</button>
-    <button onclick="appendToDisplay('6')">6</button>
-    <button onclick="appendToDisplay('-')">-</button>
-    <br>
-    <button onclick="appendToDisplay('7')">7</button>
-    <button onclick="appendToDisplay('8')">8</button>
-    <button onclick="appendToDisplay('9')">9</button>
-    <button onclick="appendToDisplay('*')">*</button>
-    <br>
-    <button onclick="appendToDisplay('0')">0</button>
-    <button onclick="clearDisplay()">C</button>
-    <button onclick="calculate()">=</button>
-    <button onclick="appendToDisplay('/')">/</button>
+  <script>
+    const canvas = document.getElementById("tetrisCanvas");
+    const context = canvas.getContext("2d");
 
-    <!-- JavaScript 코드 -->
-    <script>
-        // 화면에 표시되는 값을 조작하는 함수
-        function appendToDisplay(value) {
-            document.getElementById('display').value += value;
+    const blockSize = 30;
+    const rows = canvas.height / blockSize;
+    const cols = canvas.width / blockSize;
+
+    const board = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+    const colors = ["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF", "#FF00FF", "#C0C0C0"];
+
+    const shapes = [
+      [[1, 1, 1, 1]],
+      [[1, 1, 1], [1]],
+      [[1, 1, 1], [0, 0, 1]],
+      [[1, 1, 1], [0, 1]],
+      [[1, 1], [1, 1]],
+      [[1, 1, 0], [0, 1, 1]],
+      [[0, 1, 1], [1, 1]]
+    ];
+
+    let currentShape = getRandomShape();
+    let currentRow = 0;
+    let currentCol = Math.floor(cols / 2) - Math.floor(currentShape[0].length / 2);
+
+    function getRandomShape() {
+      const randomIndex = Math.floor(Math.random() * shapes.length);
+      return shapes[randomIndex];
+    }
+
+    function drawBlock(x, y, color) {
+      context.fillStyle = color;
+      context.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
+      context.strokeStyle = "#333";
+      context.strokeRect(x * blockSize, y * blockSize, blockSize, blockSize);
+    }
+
+    function drawBoard() {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          if (board[row][col]) {
+            drawBlock(col, row, colors[board[row][col]]);
+          }
         }
+      }
+    }
 
-        // 화면을 초기화하는 함수
-        function clearDisplay() {
-            document.getElementById('display').value = '';
+    function drawCurrentShape() {
+      for (let row = 0; row < currentShape.length; row++) {
+        for (let col = 0; col < currentShape[row].length; col++) {
+          if (currentShape[row][col]) {
+            drawBlock(currentCol + col, currentRow + row, colors[currentShape[row][col]]);
+          }
         }
+      }
+    }
 
-        // 계산을 수행하고 결과를 화면에 표시하는 함수
-        function calculate() {
-            var result;
-            try {
-                result = eval(document.getElementById('display').value);
-            } catch (error) {
-                result = '에러';
-            }
-            document.getElementById('display').value = result;
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawBoard();
+      drawCurrentShape();
+    }
+
+    function moveDown() {
+      currentRow++;
+
+      if (collision()) {
+        merge();
+        reset();
+      }
+    }
+
+    function collision() {
+      for (let row = 0; row < currentShape.length; row++) {
+        for (let col = 0; col < currentShape[row].length; col++) {
+          if (currentShape[row][col] && (board[currentRow + row] && board[currentRow + row][currentCol + col]) !== 0) {
+            return true;
+          }
         }
-    </script>
+      }
+      return false;
+    }
+
+    function merge() {
+      for (let row = 0; row < currentShape.length; row++) {
+        for (let col = 0; col < currentShape[row].length; col++) {
+          if (currentShape[row][col]) {
+            board[currentRow + row][currentCol + col] = 1;
+          }
+        }
+      }
+    }
+
+    function reset() {
+      currentShape = getRandomShape();
+      currentRow = 0;
+      currentCol = Math.floor(cols / 2) - Math.floor(currentShape[0].length / 2);
+    }
+
+    function update() {
+      moveDown();
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
 </body>
 </html>
