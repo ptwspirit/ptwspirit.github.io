@@ -94,10 +94,51 @@
       }
     }
 
+    function moveLeft() {
+      currentCol--;
+      if (collision()) {
+        currentCol++;
+      }
+    }
+
+    function moveRight() {
+      currentCol++;
+      if (collision()) {
+        currentCol--;
+      }
+    }
+
+    function rotate() {
+      const rotatedShape = [];
+      for (let col = 0; col < currentShape[0].length; col++) {
+        rotatedShape[col] = [];
+        for (let row = 0; row < currentShape.length; row++) {
+          rotatedShape[col][row] = currentShape[currentShape.length - 1 - row][col];
+        }
+      }
+
+      if (!collisionWithRotation(rotatedShape)) {
+        currentShape = rotatedShape;
+      }
+    }
+
+    function collisionWithRotation(rotatedShape) {
+      for (let row = 0; row < rotatedShape.length; row++) {
+        for (let col = 0; col < rotatedShape[row].length; col++) {
+          if (rotatedShape[row][col] &&
+            (board[currentRow + row] && board[currentRow + row][currentCol + col]) !== 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
     function collision() {
       for (let row = 0; row < currentShape.length; row++) {
         for (let col = 0; col < currentShape[row].length; col++) {
-          if (currentShape[row][col] && (board[currentRow + row] && board[currentRow + row][currentCol + col]) !== 0) {
+          if (currentShape[row][col] &&
+            (board[currentRow + row] && board[currentRow + row][currentCol + col]) !== 0) {
             return true;
           }
         }
@@ -132,6 +173,25 @@
         }
       }
     }
+
+    function handleKeyPress(event) {
+      switch (event.key) {
+        case "ArrowDown":
+          moveDown();
+          break;
+        case "ArrowLeft":
+          moveLeft();
+          break;
+        case "ArrowRight":
+          moveRight();
+          break;
+        case "ArrowUp":
+          rotate();
+          break;
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyPress);
 
     function update() {
       moveDown();
