@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player</title>
+</head>
+<body>
+
+<audio id="audioPlayer" preload="auto">
+    <source id="audioSource" src="" type="audio/mp3">
+</audio>
+
+<button onclick="playAudio('LEFT.mp3')">LEFT</button>
+<button onclick="playAudio('RIGHT.mp3')">RIGHT</button>
+<button onclick="playAudio('BOTH.mp3')">BOTH</button>
+
+<script>
+    function playAudio(source) {
+        var audioPlayer = document.getElementById('audioPlayer');
+        var audioSource = document.getElementById('audioSource');
+
+        // Set the audio source
+        audioSource.src = source;
+
+        // Load and play the audio
+        audioPlayer.load();
+        audioPlayer.play();
+    }
+</script>
+
+</body>
+</html>
